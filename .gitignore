@@ -1,0 +1,9 @@
+.env
+ml/model.pkl
+ml/label_encoder.pkl
+ml/data/raw/
+__pycache__/
+*.pyc
+docs/
+skills/
+CLAUDE.md
