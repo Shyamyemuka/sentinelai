@@ -10,23 +10,20 @@ SentinelAI is a full-stack intrusion detection platform that classifies maliciou
 ## Architecture
 
 ```mermaid
-graph TD
+graph LR
     subgraph Offline ML Pipeline
-        A[CICIDS 2017 Dataset] --> B[Data Preprocessing & SMOTE]
-        B --> C[XGBoost Model Training]
-        C --> D["model.pkl & feature_importance.json"]
+        A[CICIDS 2017 Dataset] --> B[Preprocessing & SMOTE]
+        B --> C[XGBoost Training]
+        C --> D["model.pkl"]
     end
 
     subgraph Real-Time Detection
-        E[Demo Replay Script] -- "POST /api/classify (with JWT)" --> F[FastAPI Backend]
-        D -. "Load Model at Startup" .-> F
-        F --> G[XGBoost Inference & Alert Construction]
-        G -- "SSE (Server-Sent Events) Stream" --> H[Next.js Frontend]
-        H --> I[Real-Time Analyst Dashboard]
+        E[Replay Script] -- "POST /api/classify" --> F[FastAPI Backend]
+        D -. "Load Model" .-> F
+        F --> G[XGBoost Inference]
+        G -- "SSE Stream" --> H[Next.js Frontend]
+        H --> I[Analyst Dashboard]
     end
-
-    style D fill:#f9f,stroke:#333,stroke-width:2px
-    style I fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -70,7 +67,7 @@ Web Attack - Sql Injection       0.10      0.50      0.17         4
 ### Confusion Matrix
 Below is the confusion matrix generated from the held-out test set:
 
-![Confusion Matrix](ml/evaluation_report/confusion_matrix.png)
+<img src="ml/evaluation_report/confusion_matrix.png" width="550" alt="Confusion Matrix" />
 
 ---
 
@@ -148,10 +145,9 @@ python replay.py --delay 200
 
 ## Dataset
 
-CICIDS 2017 is available from the Canadian Institute for Cybersecurity:  
-https://www.unb.ca/cic/datasets/ids-2017.html
+The CICIDS 2017 benchmark dataset is sourced from Kaggle. 
 
-Download all five day-CSVs and place them in `ml/data/raw/`. The training script loads and concatenates them automatically.
+The preprocessing script (`preprocess.py`) automatically downloads the dataset files via `kagglehub` and processes them directly, so no manual download is required.
 
 ---
 
