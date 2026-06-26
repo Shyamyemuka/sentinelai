@@ -3,27 +3,14 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="relative min-h-screen bg-background text-cream selection:bg-neon selection:text-background overflow-x-hidden">
-      
-      {/* SECTION 1: HERO */}
-      <section className="relative min-h-screen flex flex-col justify-between overflow-hidden rounded-b-[32px] border-b border-white/10 z-10">
-        {/* Background Video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
-          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4"
-        />
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-black/40 z-0"></div>
 
-        {/* Navbar */}
-        <header className="relative z-20 max-w-[1831px] w-full mx-auto px-6 lg:px-16 py-6 flex items-center justify-between">
+      {/* Sticky Navbar */}
+      <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md bg-black/40 border-b border-white/5 py-4">
+        <div className="max-w-[1831px] w-full mx-auto px-6 lg:px-16 flex items-center justify-between">
           <div className="font-grotesk text-xl tracking-wider select-none text-cream flex items-center gap-1.5">
             SENTINEL<span className="text-neon">.</span>AI
           </div>
-          
+
           <nav className="hidden lg:block liquid-glass rounded-[28px] px-12 py-5">
             <ul className="flex items-center gap-10 font-grotesk text-[13px] tracking-widest text-cream/70 uppercase">
               <li>
@@ -37,8 +24,8 @@ export default function Home() {
                 </Link>
               </li>
               <li>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-neon transition-colors duration-300">
-                  Open Source
+                <a href="https://github.com/Shyamyemuka" target="_blank" rel="noopener noreferrer" className="hover:text-neon transition-colors duration-300">
+                  Github
                 </a>
               </li>
             </ul>
@@ -47,11 +34,26 @@ export default function Home() {
           <Link href="/login" className="liquid-glass rounded-full px-6 py-2.5 font-grotesk text-[13px] tracking-wider uppercase text-neon hover:bg-neon hover:text-background transition-all duration-300">
             Launch Console
           </Link>
-        </header>
+        </div>
+      </header>
+
+      {/* SECTION 1: HERO */}
+      <section className="relative min-h-screen flex flex-col justify-between overflow-hidden rounded-b-[32px] border-b border-white/10 z-10">
+        {/* Background Video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-70 contrast-[1.6] brightness-[0.65] saturate-[1.4]"
+          src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_045634_e1c98c76-1265-4f5c-882a-4276f2080894.mp4"
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-black/40 z-0"></div>
 
         {/* Hero Content */}
-        <div className="relative z-10 max-w-[1831px] w-full mx-auto px-6 lg:px-16 flex-1 flex flex-col justify-center pt-22 pb-24">
-          <div className="relative max-w-4xl lg:ml-24 -translate-y-6">
+        <div className="relative z-10 max-w-[1831px] w-full mx-auto px-6 lg:px-16 flex-1 flex flex-col justify-center pt-48 pb-24">
+          <div className="relative max-w-4xl lg:ml-24">
             {/* Cursive overlay */}
             <span className="absolute -top-10 right-4 lg:right-24 font-condiment text-[32px] sm:text-[48px] text-neon -rotate-6 select-none mix-blend-exclusion">
               Intrusion detection
@@ -77,7 +79,7 @@ export default function Home() {
         {/* Footer info (Desktop only) */}
         <div className="relative z-10 max-w-[1831px] w-full mx-auto px-6 lg:px-16 pb-8 flex items-center justify-between font-mono text-[10px] text-cream/40 uppercase tracking-widest">
           <div>CICIDS 2017 Benchmark Dataset</div>
-          <div>Blackbucks Security Analyst Internship © 2026</div>
+          <div>Built by Shyam Yemuka © 2026</div>
         </div>
       </section>
 
@@ -89,7 +91,7 @@ export default function Home() {
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover z-0 opacity-40"
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-40 contrast-[1.6] brightness-[0.65] saturate-[1.4]"
           src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_151551_992053d1-3d3e-4b8c-abac-45f22158f411.mp4"
         />
         {/* Dark overlay */}
@@ -106,7 +108,7 @@ export default function Home() {
                 I'M SENTINEL
               </h2>
             </div>
-            
+
             <div className="space-y-6">
               <p className="font-mono text-[15px] uppercase tracking-wider text-cream max-w-md leading-relaxed">
                 A digital object fixed beyond signatures, rules, or temporary files. Utilizing an XGBoost 2.1 tree ensemble to classify malicious network packets.
@@ -145,13 +147,13 @@ export default function Home() {
       </section>
 
       {/* SECTION 3: THREAT GRID */}
-      <section id="capabilities" className="relative min-h-screen bg-[#010828] z-10 py-28 flex flex-col justify-center">
+      <section id="capabilities" className="relative min-h-screen bg-background z-10 py-28 flex flex-col justify-center">
         <div className="max-w-[1831px] w-full mx-auto px-6 lg:px-16 flex flex-col gap-16">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
               <h2 className="font-grotesk text-[32px] sm:text-[60px] uppercase leading-none">
                 DETECTING TYPES OF <br />
-                <span className="font-condiment text-[42px] sm:text-[68px] text-neon lowercase font-normal italic select-none inline-block -rotate-1 mr-4">network</span> 
+                <span className="font-condiment text-[42px] sm:text-[68px] text-neon lowercase font-normal italic select-none inline-block -rotate-1 mr-4">network</span>
                 ATTACKS
               </h2>
             </div>
@@ -232,6 +234,63 @@ export default function Home() {
               </div>
             </div>
           </div>
+
+          {/* Expanded Threat List Grid */}
+          <div className="mt-12">
+            <h3 className="font-mono text-[11px] text-neon uppercase tracking-widest mb-8 text-center sm:text-left border-b border-white/5 pb-4">
+              Additional Classified Attack Patterns & Signatures
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="liquid-glass p-5 rounded-2xl border border-white/5 hover:bg-white/5 transition-colors duration-300">
+                <h5 className="font-grotesk text-lg tracking-wider text-cream uppercase">DoS GoldenEye</h5>
+                <p className="mt-2 font-mono text-[10px] text-cream/50 uppercase leading-relaxed">
+                  HTTP flood attack targeting resource exhaustion via high-concurrency requests.
+                </p>
+              </div>
+              <div className="liquid-glass p-5 rounded-2xl border border-white/5 hover:bg-white/5 transition-colors duration-300">
+                <h5 className="font-grotesk text-lg tracking-wider text-cream uppercase">DoS Slowloris</h5>
+                <p className="mt-2 font-mono text-[10px] text-cream/50 uppercase leading-relaxed">
+                  Low-and-slow attack keeping server HTTP connections open with partial request headers.
+                </p>
+              </div>
+              <div className="liquid-glass p-5 rounded-2xl border border-white/5 hover:bg-white/5 transition-colors duration-300">
+                <h5 className="font-grotesk text-lg tracking-wider text-cream uppercase">DoS Slowhttptest</h5>
+                <p className="mt-2 font-mono text-[10px] text-cream/50 uppercase leading-relaxed">
+                  Slow-rate attack exhausting thread pools by delaying standard HTTP request bodies.
+                </p>
+              </div>
+              <div className="liquid-glass p-5 rounded-2xl border border-white/5 hover:bg-white/5 transition-colors duration-300">
+                <h5 className="font-grotesk text-lg tracking-wider text-cream uppercase">FTP / SSH Patator</h5>
+                <p className="mt-2 font-mono text-[10px] text-cream/50 uppercase leading-relaxed">
+                  Multi-threaded network brute force attacks targeting authentication mechanisms.
+                </p>
+              </div>
+              <div className="liquid-glass p-5 rounded-2xl border border-white/5 hover:bg-white/5 transition-colors duration-300">
+                <h5 className="font-grotesk text-lg tracking-wider text-cream uppercase">Web Brute Force</h5>
+                <p className="mt-2 font-mono text-[10px] text-cream/50 uppercase leading-relaxed">
+                  Application-layer credential stuffing and brute force login directory scanning.
+                </p>
+              </div>
+              <div className="liquid-glass p-5 rounded-2xl border border-white/5 hover:bg-white/5 transition-colors duration-300">
+                <h5 className="font-grotesk text-lg tracking-wider text-cream uppercase">Web Attacks (XSS / SQLi)</h5>
+                <p className="mt-2 font-mono text-[10px] text-cream/50 uppercase leading-relaxed">
+                  Cross-Site Scripting injections and SQL database query manipulation threats.
+                </p>
+              </div>
+              <div className="liquid-glass p-5 rounded-2xl border border-white/5 hover:bg-white/5 transition-colors duration-300">
+                <h5 className="font-grotesk text-lg tracking-wider text-cream uppercase">Botnet Coordination</h5>
+                <p className="mt-2 font-mono text-[10px] text-cream/50 uppercase leading-relaxed">
+                  Command & Control (C2) bot communication patterns and infected host actions.
+                </p>
+              </div>
+              <div className="liquid-glass p-5 rounded-2xl border border-white/5 hover:bg-white/5 transition-colors duration-300">
+                <h5 className="font-grotesk text-lg tracking-wider text-cream uppercase">Infiltration / Heartbleed</h5>
+                <p className="mt-2 font-mono text-[10px] text-cream/50 uppercase leading-relaxed">
+                  Internal network pivoting, exploits, and SSL memory leakage vulnerability attacks.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -243,7 +302,7 @@ export default function Home() {
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover z-0 opacity-40"
+          className="absolute inset-0 w-full h-full object-cover z-0 opacity-40 contrast-[1.6] brightness-[0.65] saturate-[1.4]"
           src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260331_055729_72d66327-b59e-4ae9-bb70-de6ccb5ecdb0.mp4"
         />
         {/* Dark overlay */}

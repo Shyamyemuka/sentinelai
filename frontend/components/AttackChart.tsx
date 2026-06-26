@@ -44,7 +44,7 @@ export function AttackChart({ counts }: AttackChartProps) {
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#010828',
+              backgroundColor: '#050505',
               border: '1px solid rgba(255, 255, 255, 0.1)',
               borderRadius: '16px',
               fontFamily: 'monospace',

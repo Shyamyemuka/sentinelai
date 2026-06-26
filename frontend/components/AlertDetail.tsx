@@ -86,7 +86,7 @@ export function AlertDetail({ alert }: AlertDetailProps) {
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: '#010828',
+                  backgroundColor: '#050505',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
                   borderRadius: '12px',
                   fontFamily: 'monospace',

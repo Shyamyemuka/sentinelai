@@ -2,11 +2,39 @@
 @import "tailwindcss";
 
 :root {
-  --background: #010828;
+  --background: #050505;
   --foreground: #EFF4FF;
   --cream: #EFF4FF;
   --neon: #6FFF00;
 }
+
+/* Custom Scrollbars to match dark scheme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(5, 5, 5, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(111, 255, 0, 0.35); /* Subtle neon glow hover */
+}
+
+/* Firefox scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) rgba(5, 5, 5, 0.5);
+}
+
 
 @theme inline {
   --color-background: var(--background);
@@ -20,11 +48,16 @@
 }
 
 body {
-  background: var(--background);
+  background: #050505 !important;
   color: var(--foreground);
   font-family: var(--font-sans);
   overflow-x: hidden;
 }
+
+.bg-background {
+  background-color: #050505 !important;
+}
+
 
 /* Texture overlay */
 .bg-texture {
