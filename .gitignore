@@ -15,4 +15,4 @@ ml/data/y_train.csv
 ml/data/X_test.csv
 ml/data/y_test.csv
 ml/data/test_set.csv
-ml/data/raw/
+scratch/
