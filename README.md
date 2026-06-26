@@ -3,51 +3,25 @@
 **Real-Time Intrusion Detection System**  
 Cyber Defense & Security Analyst Internship — Blackbucks · 2026
 
-SentinelAI is a full-stack, real-time intrusion detection platform designed to classify network traffic and stream threat alerts to an analyst console. Leveraging a machine learning classifier trained on the CICIDS 2017 benchmark dataset, the system achieves a 99.77% Weighted F1-score across 15 classification categories (14 specific attack classes and normal traffic).
-
----
-
-## Features
-
-### Machine Learning Pipeline
-* **Balanced Data Preprocessing:** Automated data acquisition, cleaning of Unicode anomalies, and class balancing using a hybrid downsampling and SMOTE oversampling pipeline.
-* **XGBoost Classifier:** High-performance multiclass inference utilizing XGBoost 2.1.
-* **Evaluation Suite:** Static evaluation generating standard classification reports and confusion matrix plots using a headless rendering backend.
-* **Live Replay Simulator:** Traffic replay script that simulates live network flow ingestion by streaming rows to the classification endpoint.
-
-### FastAPI Backend
-* **Inference Endpoint:** Receives 78 network flow features, validates them using Pydantic schemas, and runs real-time model inference.
-* **Server-Sent Events (SSE) Stream:** Broadcasts classified alerts to connected clients in real time.
-* **Authentication Engine:** Secure password verification using direct `bcrypt` hashing and JWT issuance.
-* **Hardened Security Middleware:** Strict CORS settings, custom security response headers, and automatic stack trace suppression.
-
-### Next.js Frontend
-* **Landing Page:** Professional landing interface presenting core capabilities and high-level project metrics.
-* **Administrative Login:** Gateway utilizing HTTP-only cookie session management to protect downstream dashboard routes.
-* **Analyst Dashboard:** A unified, real-time interface containing:
-  * **Metric Tiles:** Live status metrics tracking total flow volume, benign traffic percentages, and attack detection counts.
-  * **Live Alert Feed:** An auto-scrolling terminal feed displaying incoming flows with color-coded threat severity.
-  * **Interactive Feature Inspector:** Granular inspector panel displaying all 78 classification features upon selecting an alert.
-  * **Visual Analytics:** Real-time distribution chart mapping threat classes using Recharts.
+SentinelAI is a full-stack, real-time intrusion detection platform designed to classify network traffic and stream threat alerts. Utilizing a machine learning classifier trained on the CICIDS 2017 benchmark dataset, the system detects 14 specific attack classes alongside normal traffic, achieving a 99.77% Weighted F1-score.
 
 ---
 
 ## Architecture
 
 ```mermaid
-graph LR
+graph TD
     subgraph Offline ML Pipeline
-        A[CICIDS 2017 Dataset] --> B[Preprocessing & SMOTE]
-        B --> C[XGBoost Training]
-        C --> D["model.pkl"]
+        A[CICIDS 2017 Dataset] --> B[Data Preprocessing & SMOTE]
+        B --> C[XGBoost 2.1 Training]
+        C --> D["model.pkl (Ensemble Weights)"]
     end
 
     subgraph Real-Time Detection
-        E[Replay Script] -- "POST /api/classify" --> F[FastAPI Backend]
+        E[Traffic Simulator / replay.py] -- "HTTP POST (78 features)" --> F[FastAPI Backend / api/classify]
         D -. "Load Model" .-> F
-        F --> G[XGBoost Inference]
-        G -- "SSE Stream" --> H[Next.js Frontend]
-        H --> I[Analyst Dashboard]
+        F --> G[XGBoost Real-Time Inference]
+        G -- "SSE Event Stream" --> H[Next.js Frontend / Analyst Console]
     end
 ```
 
@@ -57,12 +31,11 @@ graph LR
 
 | Metric | Score |
 |--------|-------|
-| **Weighted F1-Score** | **0.9977 (99.77%)** |
+| **Weighted F1-Score** | **99.77%** |
 | **Accuracy** | **99.77%** |
 | **False Positive Rate** | **< 0.5%** |
 | **Dataset** | CICIDS 2017 (2.8 Million flows) |
 | **Classifier** | XGBoost 2.1 |
-| **Classes** | 15 (BENIGN + 14 attack categories) |
 
 ### Classification Report
 
@@ -84,112 +57,76 @@ graph LR
    Web Attack - Brute Force       0.72      0.70      0.71       294
  Web Attack - Sql Injection       0.10      0.50      0.17         4
            Web Attack - XSS       0.30      0.58      0.40       130
-
-                   accuracy                           1.00    504160
-                  macro avg       0.78      0.92      0.83    504160
-               weighted avg       1.00      1.00      1.00    504160
 ```
 
 ### Confusion Matrix
-The confusion matrix is generated during the evaluation phase and saved at:
-`ml/evaluation_report/confusion_matrix.png`
+
+<img src="ml/evaluation_report/confusion_matrix.png" width="380" alt="Confusion Matrix" />
 
 ---
 
-## Tech Stack
+## Tech Stack Summary
 
-| Layer | Technology |
-|-------|-----------|
-| **ML & Data** | Python 3.12 · XGBoost 2.1 · Scikit-learn 1.5 · Imbalanced-learn (SMOTE) |
-| **Backend** | FastAPI 0.115 · Uvicorn · Pydantic v2 · JWT · Bcrypt |
-| **Frontend** | Next.js 16 · React 19 · TypeScript · Recharts · Tailwind CSS v4 |
+* **ML Pipeline:** Python 3.12 · XGBoost 2.1 · Scikit-learn 1.5 · SMOTE
+* **FastAPI Backend:** FastAPI 0.115 · Uvicorn · Pydantic v2 · JWT · Bcrypt
+* **Next.js Frontend:** Next.js 16 · React 19 · TypeScript · Recharts · Tailwind CSS v4 (Refer to [frontend/README.md](file:///d:/sentinelai/frontend/README.md) for UI details)
 
 ---
 
-## Setup & Installation
+## Quick Setup & Launch Checklist
 
-### Prerequisites
-* Python 3.12+
-* Node.js 20 LTS+
-* Virtual Environment manager (`venv` / `uv`)
+Ensure Python 3.12+ and Node.js 20+ are installed.
 
-### 1. Clone and Configure Environment
 ```bash
+# 1. Clone & Configure Environment
 git clone https://github.com/Shyamyemuka/sentinelai.git
 cd sentinelai
 cp .env.example .env
-# Edit the .env file to supply your signing keys and configuration details
-```
 
-### 2. Preprocess Data and Train the Model
-```bash
-# Set up Python virtual environment
+# 2. Virtual Env setup & ML Training
 python -m venv venv
-./venv/Scripts/activate      # On Windows
-source venv/bin/activate    # On Unix/macOS
+./venv/Scripts/activate     # Windows
+pip install -r ml/requirements.txt
+python ml/preprocess.py
+python ml/train.py
 
-# Install dependencies and run training
-cd ml
-pip install -r requirements.txt
-python preprocess.py
-python train.py
-# Outputs: model.pkl, label_encoder.pkl, and feature_importance.json
-```
+# 3. Start Backend Server
+pip install -r backend/requirements.txt
+uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
 
-### 3. Run the FastAPI Backend
-```bash
-cd ../backend
-pip install -r requirements.txt
-uvicorn main:app --host 127.0.0.1 --port 8000 --reload
-```
-
-### 4. Run the Next.js Frontend
-```bash
-cd ../frontend
+# 4. Start Next.js Frontend (New Terminal)
+cd frontend
 npm install
 npm run dev
-# The local development server will be active at http://localhost:3000
+
+# 5. Start Replay Simulator Ingestion (New Terminal)
+python ml/replay.py --password sentinelaipass --delay 0.5 --limit 1000
 ```
-
-### 5. Run the Simulation Replay
-```bash
-cd ../
-# In a separate terminal session, start streaming mock traffic
-./venv/Scripts/python ml/replay.py --password sentinelaipass --delay 0.5 --limit 200
-```
-
----
-
-## Security Engineering Checklist
-* **Access Control:** JWT verification required on all protected paths. Cookies stored with the `HttpOnly`, `Secure`, and `SameSite=Lax` properties.
-* **Input Validation:** Strict type checking and value validation bounds via Pydantic schemas.
-* **Secret Isolation:** Environment configurations are isolated inside `.env` and loaded securely via `pydantic-settings`.
-* **CORS Policies:** CORS origin configuration restricted to designated frontend locations.
-* **Error Resilience:** Global exception handlers capture server faults and suppress raw traceback exposure to clients.
 
 ---
 
 ## Project Structure
+
 ```text
 sentinelai/
 ├── ml/
-│   ├── preprocess.py      # Cleans, downsamples, and balances the CICIDS dataset
-│   ├── train.py           # Trains the XGBoost multiclass model
+│   ├── preprocess.py      # Cleans, downsamples, and balances dataset
+│   ├── train.py           # Trains the XGBoost model
 │   ├── evaluate.py        # Validates model metrics against the test subset
-│   └── replay.py          # Streams network packets to simulate active attacks
+│   └── replay.py          # Ingestion simulator script
 ├── backend/
-│   ├── main.py            # API app entrypoint and middleware definition
-│   ├── auth.py            # Authentication, JWT signing, and Bcrypt validation
-│   ├── classify.py        # Model inference routing
-│   ├── stream.py          # Server-Sent Events queues
-│   ├── schemas.py         # Network flow schema validation models
-│   └── config.py          # System environment settings
+│   ├── main.py            # API server routing
+│   ├── auth.py            # Password hashing & JWT validation
+│   ├── classify.py        # Real-time inference routing
+│   ├── stream.py          # Server-Sent Events broker
+│   ├── schemas.py         # Network flow validators
+│   └── config.py          # Settings loader
 ├── frontend/
-│   ├── app/               # Page routes (Landing, Login, Dashboard)
-│   ├── components/        # Dashboard layout widgets and live feeds
-│   └── middleware.ts      # Authentication navigation guards
+│   ├── app/               # Landing, Login, and Dashboard routers
+│   ├── components/        # Interactive visuals and feeds
+│   └── README.md          # Frontend architecture specifications
 ├── .env.example
-├── CLAUDE.md
+├── .gitignore
 └── README.md
 ```
 
@@ -201,4 +138,4 @@ sentinelai/
 *B.Tech CSE (Data Science) · AITS Rajampet*  
 **Role:** Cyber Defense & Security Analyst Intern  
 **Company:** Blackbucks  
-**Project Date:** 2026
+**Project Year:** 2026

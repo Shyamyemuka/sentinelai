@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SentinelAI — Next.js Frontend Console
 
-## Getting Started
+This directory contains the source code for the Next.js frontend analyst dashboard. The application connects to the FastAPI backend server using Server-Sent Events (SSE) to stream classified traffic alerts.
 
-First, run the development server:
+---
+
+## Features
+
+### 1. Landing Portal
+* **Immersive Space-Cybersecurity Hero:** Features clean cinematic looping space backgrounds and high-contrast styling.
+* **Sticky Glassmorphic Header:** Blur-backdrop navbar anchor providing persistent navigation links and a direct console gate launcher.
+* **Network Threat Grid:** Showcases the 15 classified attack classes (including volumetric DDoS, Port Scans, and Slow HTTP attacks) in a visual grid layout.
+
+### 2. Administrative Gateway
+* **Cookie-Based JWT Storage:** Secures sessions using `httpOnly`, `Secure`, and `SameSite=Strict` browser cookies.
+* **Access Route Guarding:** Secure middleware verification redirection logic checking for active sessions.
+
+### 3. Analyst Dashboard Console
+* **Real-Time Alert Feed:** Auto-scrolling logs showing incoming flow payloads color-coded by classified threat severity.
+* **Feature Inspector:** Panel listing all 78 network features (such as packet sizes, flags, and window bytes) when selecting an alert from the feed.
+* **Distribution Charts:** Interactive live bar charts mapping session threat percentages utilizing Recharts.
+* **Metrics Counters:** Aggregated summaries tracking total flows logged, total attacks blocked, and benign traffic percentages.
+
+---
+
+## Tech Stack
+* **Framework:** Next.js 16.2 (Turbopack)
+* **Core Library:** React 19
+* **Language:** TypeScript
+* **Styling:** Tailwind CSS v4
+* **Charts:** Recharts 2.15
+
+---
+
+## Installation & Commands
+
+Ensure Node.js 20 LTS+ is installed.
 
 ```bash
+# Install dependencies
+npm install
+
+# Run local development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Generate production optimization build
+npm run build
+
+# Start production server
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture Flow
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```text
+Browser Client
+   |
+   +--> [EventSource] --> Next.js Route Proxy (/api/stream)
+                             |
+                             +--> FastAPI Backend (/api/stream) [Persistent SSE]
+```
