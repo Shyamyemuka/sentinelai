@@ -91,13 +91,13 @@ def main():
                     attack_counts[attack_type] = attack_counts.get(attack_type, 0) + 1
 
                 # Console output for demo visibility
-                marker = "🔴" if severity == "High" else "🟡" if severity == "Medium" else "🟢" if severity == "Low" else "⚪"
+                marker = "[HIGH]" if severity == "High" else "[MED ]" if severity == "Medium" else "[LOW ]" if severity == "Low" else "[OK  ]"
                 print(f"[{i:04d}] {marker} {attack_type:<30} {confidence*100:.1f}%  (true: {true_label})")
             else:
-                print(f"[{i:04d}] ❌ Server error: {response.status_code} - {response.text}")
+                print(f"[{i:04d}] [ERR ] Server error: {response.status_code} - {response.text}")
 
         except requests.exceptions.RequestException as e:
-            print(f"[{i:04d}] ❌ Request failed: {e}")
+            print(f"[{i:04d}] [ERR ] Request failed: {e}")
 
         time.sleep(args.delay)
 
