@@ -9,21 +9,24 @@ SentinelAI is a full-stack intrusion detection platform that classifies maliciou
 
 ## Architecture
 
-```
-[CICIDS 2017 Dataset]
-        │
-        ▼
-[ML Training Pipeline]  ──────────►  model.pkl
-        
-[Demo Replay Script]
-        │  POST /api/classify
-        ▼
-[FastAPI Backend]
-   JWT Auth · Pydantic Validation · XGBoost Inference
-        │  SSE stream
-        ▼
-[Next.js Dashboard]
-   Live Alert Feed · Attack Charts · Feature Importance
+```mermaid
+graph TD
+    subgraph Offline ML Pipeline
+        A[CICIDS 2017 Dataset] --> B[Data Preprocessing & SMOTE]
+        B --> C[XGBoost Model Training]
+        C --> D["model.pkl & feature_importance.json"]
+    end
+
+    subgraph Real-Time Detection
+        E[Demo Replay Script] -- "POST /api/classify (with JWT)" --> F[FastAPI Backend]
+        D -. "Load Model at Startup" .-> F
+        F --> G[XGBoost Inference & Alert Construction]
+        G -- "SSE (Server-Sent Events) Stream" --> H[Next.js Frontend]
+        H --> I[Real-Time Analyst Dashboard]
+    end
+
+    style D fill:#f9f,stroke:#333,stroke-width:2px
+    style I fill:#bbf,stroke:#333,stroke-width:2px
 ```
 
 ---
@@ -32,24 +35,53 @@ SentinelAI is a full-stack intrusion detection platform that classifies maliciou
 
 | Metric | Score |
 |--------|-------|
-| Weighted F1 | ≥ 0.95 |
-| False Positive Rate | < 5% |
-| Dataset | CICIDS 2017 |
-| Classifier | XGBoost 2.1 |
-| Classes | 8 (BENIGN + 7 attack types) |
+| **Weighted F1-Score** | **0.9977 (99.77%)** |
+| **Accuracy** | **99.77%** |
+| **False Positive Rate** | **< 0.5%** |
+| **Dataset** | CICIDS 2017 (2.8 Million flows) |
+| **Classifier** | XGBoost 2.1 |
+| **Classes** | 15 (BENIGN + 14 attack categories) |
 
-Confusion matrix and per-class breakdown: see `/ml/evaluation_report/`
+### Detailed Classification Report
+```text
+                            precision    recall  f1-score   support
+
+                    BENIGN       1.00      1.00      1.00    419012
+                       Bot       0.38      1.00      0.55       390
+                      DDoS       1.00      1.00      1.00     25603
+             DoS GoldenEye       0.98      1.00      0.99      2057
+                  DoS Hulk       1.00      1.00      1.00     34569
+          DoS Slowhttptest       0.96      1.00      0.98      1046
+             DoS slowloris       0.98      0.99      0.98      1077
+               FTP-Patator       1.00      1.00      1.00      1186
+                Heartbleed       0.67      1.00      0.80         2
+              Infiltration       0.70      1.00      0.82         7
+                  PortScan       0.99      1.00      0.99     18139
+               SSH-Patator       0.99      1.00      1.00       644
+  Web Attack - Brute Force       0.72      0.70      0.71       294
+Web Attack - Sql Injection       0.10      0.50      0.17         4
+          Web Attack - XSS       0.30      0.58      0.40       130
+
+                  accuracy                           1.00    504160
+                 macro avg       0.78      0.92      0.83    504160
+              weighted avg       1.00      1.00      1.00    504160
+```
+
+### Confusion Matrix
+Below is the confusion matrix generated from the held-out test set:
+
+![Confusion Matrix](ml/evaluation_report/confusion_matrix.png)
 
 ---
 
 ## Attack Classes Detected
 
-- BENIGN
-- DoS GoldenEye / Hulk / Slowhttptest / Slowloris
-- DDoS
-- FTP-Patator · SSH-Patator (Brute Force)
-- PortScan
-- Web Attack — Brute Force · XSS · SQL Injection
+* **BENIGN** (Normal everyday traffic)
+* **DoS / DDoS** (Hulk, GoldenEye, Slowloris, Slowhttptest, DDoS)
+* **Brute Force** (FTP-Patator, SSH-Patator)
+* **Reconnaissance** (PortScan)
+* **Web Attacks** (Brute Force, XSS, SQL Injection)
+* **Other Threats** (Botnet, Infiltration, Heartbleed)
 
 ---
 
