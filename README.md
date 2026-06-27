@@ -3,11 +3,11 @@
 **Real-Time Intrusion Detection System**  
 Cyber Defense & Security Analyst Internship — Blackbucks · 2026
 
-SentinelAI is a full-stack, real-time intrusion detection platform designed to classify network traffic and stream threat alerts. Utilizing a machine learning classifier trained on the CICIDS 2017 benchmark dataset, the system detects 14 specific attack classes alongside normal traffic, achieving a 99.77% Weighted F1-score.
+SentinelAI is a full-stack, real-time intrusion detection platform designed to classify network traffic and stream threat alerts. Utilizing an XGBoost machine learning classifier trained on the CICIDS 2017 benchmark dataset, the system detects 14 specific attack classes alongside normal traffic, achieving a 99.77% Weighted F1-score.
 
 ---
 
-## Architecture
+## System Architecture
 
 ```mermaid
 graph TD
@@ -18,7 +18,7 @@ graph TD
     end
 
     subgraph Real-Time Detection
-        E[Traffic Simulator / replay.py] -- "HTTP POST (78 features)" --> F[FastAPI Backend / api/classify]
+        E[Console Simulator Trigger] -- "API POST" --> F[FastAPI Backend / api/simulator]
         D -. "Load Model" .-> F
         F --> G[XGBoost Real-Time Inference]
         G -- "SSE Event Stream" --> H[Next.js Frontend / Analyst Console]
@@ -27,7 +27,7 @@ graph TD
 
 ---
 
-## Model Performance
+## Model Validation Metrics
 
 | Metric | Score |
 |--------|-------|
@@ -37,39 +37,41 @@ graph TD
 | **Dataset** | CICIDS 2017 (2.8 Million flows) |
 | **Classifier** | XGBoost 2.1 |
 
-### Classification Report
-
-```text
-                            precision    recall  f1-score   support
-
-                    BENIGN       1.00      1.00      1.00    419012
-                        Bot       0.38      1.00      0.55       390
-                       DDoS       1.00      1.00      1.00     25603
-              DoS GoldenEye       0.98      1.00      0.99      2057
-                   DoS Hulk       1.00      1.00      1.00     34569
-           DoS Slowhttptest       0.96      1.00      0.98      1046
-              DoS slowloris       0.98      0.99      0.98      1077
-                FTP-Patator       1.00      1.00      1.00      1186
-                 Heartbleed       0.67      1.00      0.80         2
-               Infiltration       0.70      1.00      0.82         7
-                   PortScan       0.99      1.00      0.99     18139
-                SSH-Patator       0.99      1.00      1.00       644
-   Web Attack - Brute Force       0.72      0.70      0.71       294
- Web Attack - Sql Injection       0.10      0.50      0.17         4
-           Web Attack - XSS       0.30      0.58      0.40       130
-```
-
 ### Confusion Matrix
 
 <img src="ml/evaluation_report/confusion_matrix.png" width="380" alt="Confusion Matrix" />
 
+For detailed model parameters and performance reports, refer to [ml/README.md](file:///d:/sentinelai/ml/README.md).
+
 ---
 
-## Tech Stack Summary
+## Setting up Environment Variables (ENV)
 
-* **ML Pipeline:** Python 3.12 · XGBoost 2.1 · Scikit-learn 1.5 · SMOTE
-* **FastAPI Backend:** FastAPI 0.115 · Uvicorn · Pydantic v2 · JWT · Bcrypt
-* **Next.js Frontend:** Next.js 16 · React 19 · TypeScript · Recharts · Tailwind CSS v4 (Refer to [frontend/README.md](file:///d:/sentinelai/frontend/README.md) for UI details)
+Create a file named `.env` in the root directory. You can use `.env.example` as a template. The file contains critical credentials and path configurations:
+
+```text
+SECRET_KEY=             # JWT token signature key
+ADMIN_USER=             # Administrative username
+ADMIN_PASS_HASH=        # Bcrypt hash of the admin password
+MODEL_PATH=             # Path to model.pkl
+LABEL_ENCODER_PATH=      # Path to label_encoder.pkl
+FEATURE_IMPORTANCE_PATH= # Path to feature_importance.json
+```
+
+### How to Generate Secure Values:
+
+1. **JWT Secret Key:**
+   Generate a secure, random 32-character hexadecimal key in your terminal:
+   ```bash
+   python -c "import secrets; print(secrets.token_hex(32))"
+   ```
+
+2. **Bcrypt Password Hash:**
+   Generate the hashed value of your custom plain-text password using the python-bcrypt package:
+   ```bash
+   python -c "import bcrypt; print(bcrypt.hashpw(b'YOUR_CUSTOM_PASSWORD', bcrypt.gensalt()).decode())"
+   ```
+   Copy the output string (which starts with `$2b$`) directly into the `ADMIN_PASS_HASH` variable in `.env`.
 
 ---
 
@@ -82,25 +84,31 @@ Ensure Python 3.12+ and Node.js 20+ are installed.
 git clone https://github.com/Shyamyemuka/sentinelai.git
 cd sentinelai
 cp .env.example .env
+# Edit the .env file with your generated values (see env section above)
 
-# 2. Virtual Env setup & ML Training
+# 2. Virtual Env Setup & ML Training
 python -m venv venv
-./venv/Scripts/activate     # Windows
+# Activate the venv:
+.\venv\Scripts\Activate.ps1   # On Windows PowerShell
+source venv/bin/activate      # On Unix/macOS
+
+# Install dependencies and build model
 pip install -r ml/requirements.txt
+pip install -r backend/requirements.txt
 python ml/preprocess.py
 python ml/train.py
 
 # 3. Start Backend Server
-pip install -r backend/requirements.txt
-uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
 
 # 4. Start Next.js Frontend (New Terminal)
 cd frontend
 npm install
 npm run dev
 
-# 5. Start Replay Simulator Ingestion (New Terminal)
-python ml/replay.py --password sentinelaipass --delay 0.5 --limit 1000
+# 5. Connect and Run
+# Open http://localhost:3000 in your browser, log in with your credentials,
+# and click "Start" next to the connection status badge on the dashboard.
 ```
 
 ---
@@ -112,15 +120,18 @@ sentinelai/
 ├── ml/
 │   ├── preprocess.py      # Cleans, downsamples, and balances dataset
 │   ├── train.py           # Trains the XGBoost model
-│   ├── evaluate.py        # Validates model metrics against the test subset
-│   └── replay.py          # Ingestion simulator script
+│   ├── evaluate.py        # Validates model metrics
+│   ├── replay.py          # Standalone traffic stream simulator utility
+│   └── README.md          # Machine learning pipeline documentation
 ├── backend/
 │   ├── main.py            # API server routing
 │   ├── auth.py            # Password hashing & JWT validation
 │   ├── classify.py        # Real-time inference routing
 │   ├── stream.py          # Server-Sent Events broker
+│   ├── simulator.py       # Background simulator loop manager
 │   ├── schemas.py         # Network flow validators
-│   └── config.py          # Settings loader
+│   ├── config.py          # Settings loader
+│   └── README.md          # Backend server documentation
 ├── frontend/
 │   ├── app/               # Landing, Login, and Dashboard routers
 │   ├── components/        # Interactive visuals and feeds
@@ -138,4 +149,4 @@ sentinelai/
 *B.Tech CSE (Data Science) · AITS Rajampet*  
 **Role:** Cyber Defense & Security Analyst Intern  
 **Company:** Blackbucks  
-**Project Year:** 2026
+**Project Date:** 2026
