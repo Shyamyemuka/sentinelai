@@ -12,7 +12,23 @@ export default function DashboardPage() {
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [counts, setCounts] = useState<Record<string, number>>({});
+  const [simActive, setSimActive] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchSimStatus = async () => {
+      try {
+        const res = await fetch('/api/simulator');
+        if (res.ok) {
+          const data = await res.json();
+          setSimActive(data.is_running);
+        }
+      } catch (err) {
+        console.error("Failed to fetch simulator status:", err);
+      }
+    };
+    fetchSimStatus();
+  }, []);
 
   useEffect(() => {
     // Connect to SSE stream endpoint proxy
@@ -63,6 +79,24 @@ export default function DashboardPage() {
     }
   };
 
+  const toggleSimulator = async () => {
+    try {
+      const nextAction = simActive ? 'stop' : 'start';
+      const res = await fetch('/api/simulator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: nextAction }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSimActive(data.info.is_running);
+      }
+    } catch (err) {
+      console.error("Failed to toggle simulator:", err);
+    }
+  };
+
+
   // Compute metrics summary
   const totalFlows = alerts.length;
   const attackCount = alerts.filter(a => a.attack_type !== 'BENIGN').length;
@@ -91,6 +125,24 @@ export default function DashboardPage() {
             <span className="font-mono text-[9px] uppercase tracking-widest text-cream/60">
               {status === 'connected' ? 'Active Feed' : status === 'connecting' ? 'Connecting' : 'Disconnected'}
             </span>
+          </div>
+
+          {/* Simulator Controls */}
+          <div className="flex items-center gap-3 bg-black/40 border border-white/5 rounded-full px-4 py-1">
+            <span className="font-mono text-[9px] uppercase tracking-widest text-cream/60 select-none">
+              Traffic: {simActive ? 'Streaming' : 'Paused'}
+            </span>
+            <button
+              onClick={toggleSimulator}
+              disabled={status !== 'connected'}
+              className={`font-mono text-[9px] uppercase tracking-widest px-3 py-1 rounded-full border transition-all duration-300 cursor-pointer ${
+                simActive 
+                  ? 'bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20' 
+                  : 'bg-neon/10 border-neon/30 text-neon hover:bg-neon/20'
+              }`}
+            >
+              {simActive ? 'Pause' : 'Start'}
+            </button>
           </div>
         </div>
 

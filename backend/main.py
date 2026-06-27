@@ -78,3 +78,24 @@ async def classify(flow: FlowSchema, user: str = Depends(get_current_user)):
 async def stream(user: str = Depends(get_current_user)):
     """Exposes GET /api/stream to establish an SSE stream for incoming alert feeds."""
     return await stream_alerts(user)
+
+# --- Simulator Control Routes ---
+from backend.simulator import simulator
+
+@app.post("/api/simulator/start")
+async def start_simulator(user: str = Depends(get_current_user)):
+    """Start the native background traffic simulation loop."""
+    simulator.start()
+    return {"status": "started", "info": simulator.status()}
+
+@app.post("/api/simulator/stop")
+async def stop_simulator(user: str = Depends(get_current_user)):
+    """Stop the native background traffic simulation loop."""
+    simulator.stop()
+    return {"status": "stopped", "info": simulator.status()}
+
+@app.get("/api/simulator/status")
+async def get_simulator_status(user: str = Depends(get_current_user)):
+    """Get the current state and metrics index of the native traffic simulator."""
+    return simulator.status()
+
